@@ -94,14 +94,19 @@ class Explosion {
 function createEnemy() {
     const x = Math.random() * (canvas.width - 20) + 10;
     const speed = 1;
-    const dirY=-1*Math.random()*speed
-    const dirX=-1*Math.sqrt(Math.pow(speed, 2)-Math.pow(dirY, 2))*2;
-    const enemy = new Enemy(x, 0, 10, speed, dirX, dirY, "orange"); 
+    const dirY = Math.random() * speed;
+    const dirX = -1 + Math.sqrt(Math.pow(speed, 2) - Math.pow(dirY, 2)) * 2;
+    const enemy = new Enemy(x, 0, 10, speed, dirX, dirY, "orange");
     enemies.push(enemy);
     console.log(`enemy at: ${x},travelling in direction ${dirX}, ${dirY}`);
-    const nextEnemyDelay = Math.random() * 4000 + 3000;
-    setTimeout(createEnemy, nextEnemyDelay);
+
+    const nextEnemyDelay = Math.random() * 2000 + 1000;
+    setTimeout(function() {
+        createEnemy();
+    }, nextEnemyDelay);
 }
+
+
 function animateEnemy() {
     enemies.forEach((enemy) => {
         enemy.update(1000 / 60); 
@@ -134,9 +139,10 @@ function animate() {
     enemies.forEach(function(enemy, index) {
         if (enemy.y > canvas.height || enemy.y < 0 || enemy.x > canvas.width || enemy.x < 0) {
             enemies.splice(index, 1);
-        };
+    };
     });
-}
+    };
+
 
 
 
@@ -152,6 +158,7 @@ function startGame() {
     const x = canvas.width / 2;
     const y = canvas.height - 50;
     animate();
+    createEnemy();
 }
 startGame();
 

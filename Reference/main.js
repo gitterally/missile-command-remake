@@ -169,7 +169,6 @@ function startGame() {
 startGame();
 
 function animate(step) {
-    //Runs animate over and over again 60 frames per second
     initialize();
 
     player.draw();
