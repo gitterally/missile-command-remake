@@ -18,7 +18,7 @@ This project consists of a simple canvas game where the player can click on the 
 To run this project locally, follow these steps:
 
 1. Clone the repository:
-git clone https://github.com/your-username/canvas-game.git
+git clone [https://github.com/your-username/canvas-game.git](https://github.com/gitterally/missile_command.git)
 
 2. Open the project directory:
 cd canvas-game
