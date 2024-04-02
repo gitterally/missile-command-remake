@@ -91,16 +91,27 @@ class Explosion {
 
 //Game Logic
 
-function createEnemy() {
-    const x = Math.random() * (canvas.width - 20) + 10;
-    const speed = 1;
-    const dirY = Math.random() * speed;
-    const dirX = -1 + Math.sqrt(Math.pow(speed, 2) - Math.pow(dirY, 2)) * 2;
-    const enemy = new Enemy(x, 0, 10, speed, dirX, dirY, "orange");
-    enemies.push(enemy);
-    console.log(`enemy at: ${x},travelling in direction ${dirX}, ${dirY}`);
 
-    const nextEnemyDelay = Math.random() * 2000 + 1000;
+
+function enemyDir(){
+    const rand=Math.random();
+    const speed = 2;
+    const dirY = rand * speed;
+    const velX = Math.sqrt(Math.pow(speed, 2) - Math.pow(dirY, 2))*(Math.random() < 0.5 ? -1 : 1);
+    const x = rand * canvas.width;
+    const t = canvas.height/dirY;
+    const dirX = velX*t;
+
+    return [x, velX, dirY];
+}
+
+function createEnemy() {
+    const dir = enemyDir();
+    const enemy = new Enemy(dir[0], 0, 10, speed, dir[1], dir[2], "orange");
+    enemies.push(enemy);
+    console.log(`enemy at: ${dir[0]},travelling in direction ${dir[1]}, ${dir[2]}`);
+
+    const nextEnemyDelay = Math.random() * 1000 + 1000;
     setTimeout(function() {
         createEnemy();
     }, nextEnemyDelay);
