@@ -8,10 +8,11 @@ This project consists of a simple canvas game where the player can click on the 
 
 ## Features
 
-- Click to create explosions
-- Enemies move downward from random positions
-- Explosions destroy enemies within their radius
-- Reset button to restart the game
+- Click on screen to fire missiles at that location. 
+- Enemies move downward from random positions and will harm your base ASSets if hit. 
+- Mssiles explodes and destroys enemies within their radius.
+- Keep your base running for as long as possible. 
+- Reset button to restart the game.
 
 ## Getting Started
 
