@@ -97,12 +97,18 @@ function enemyDir(){
     const rand=Math.random();
     const speed = 2;
     const dirY = rand * speed;
-    const velX = Math.sqrt(Math.pow(speed, 2) - Math.pow(dirY, 2))*(Math.random() < 0.5 ? -1 : 1);
+    const LR=(Math.random() < 0.5 ? -1 : 1);
+    const velX = Math.sqrt(Math.pow(speed, 2) - Math.pow(dirY, 2))*LR;
     const x = rand * canvas.width;
     const t = canvas.height/dirY;
-    const dirX = velX*t;
+    if (LR ===-1){
+        dirX=velX+x/t;
+    }
+    if (LR ===1){
+        dirX=velX+x/t;
+    };
 
-    return [x, velX, dirY];
+    return [x, dirX, dirY];
 }
 
 function createEnemy() {
