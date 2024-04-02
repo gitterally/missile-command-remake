@@ -10,9 +10,8 @@ var level=1;
 var enemies = [];
 var missiles = [];
 var explosions = [];
-var speed=2;
+var speed=1;
 var difficulty=1;
-
 
 
 //class constructors
@@ -29,7 +28,7 @@ class Missile {
 
 
 class Enemy{
-    constructor(x,y,radius,speed, dirX, dirY, color){
+    constructor(x,y,radius, dirX, dirY, color){
         this.x=x;
         this.y=y;
         this.radius=radius;
@@ -39,10 +38,10 @@ class Enemy{
         this.color=color;
     }
     
-    getDistToplayerExplosion() {
+    getDistToPlayerExplosion() {
         forEach(explosions, (explosion) => {
             return Math.sqrt(Math.pow(this.x - explosion.x, 2) + Math.pow(this.y - explosion.y, 2));
-        })
+        });
     }
 
 
@@ -88,41 +87,39 @@ class Explosion {
     }
 }
 
-
 //Game Logic
 
+function enemyDir() {
+    const rand = Math.random();
+    const LR = Math.random() < 0.5 ? -1 : 1;
+    const speedy = speed * (0.8 + 0.4*Math.random());
+    const dirY = Math.sqrt(1 - Math.pow(rand, 2)) * speedy;
 
+    // Ensure enemy spawns within canvas boundaries
+    const x = Math.max(10, Math.random() * (canvas.width - 20));
 
-function enemyDir(){
-    const rand=Math.random();
-    const speed = 2;
-    const dirY = rand * speed;
-    const LR=(Math.random() < 0.5 ? -1 : 1);
-    const velX = Math.sqrt(Math.pow(speed, 2) - Math.pow(dirY, 2))*LR;
-    const x = rand * canvas.width;
-    const t = canvas.height/dirY;
-    if (LR ===-1){
-        dirX=velX+x/t;
-    }
-    if (LR ===1){
-        dirX=velX+x/t;
-    };
+    // Calculate distance to center of canvas
+    const distanceToCenter = Math.abs(x - canvas.width / 2);
+
+    // Calculate horizontal velocity based on distance to center
+    const dirX = LR * (1 - distanceToCenter / (canvas.width / 2)) * speedy;
 
     return [x, dirX, dirY];
 }
 
+//enemy code
 function createEnemy() {
     const dir = enemyDir();
-    const enemy = new Enemy(dir[0], 0, 10, speed, dir[1], dir[2], "orange");
+    const enemy = new Enemy(dir[0], 1, 10, dir[1], dir[2], "orange"); //constructor(x,y,radius, dirX, dirY, color)
     enemies.push(enemy);
     console.log(`enemy at: ${dir[0]},travelling in direction ${dir[1]}, ${dir[2]}`);
 
-    const nextEnemyDelay = Math.random() * 1000 + 1000;
+    const nextEnemyDelay = Math.random() * 1000 + 0;
     setTimeout(function() {
         createEnemy();
     }, nextEnemyDelay);
 }
-
+createEnemy();
 
 function animateEnemy() {
     enemies.forEach((enemy) => {
@@ -130,8 +127,11 @@ function animateEnemy() {
     });
 }
 
-function createExplosion(x, y) {
-    const explosion = new Explosion(x, y, 0, 60, "red", 1200);
+
+//missile code
+
+function createMissile(x, y) {
+    const explosion = new Explosion(x, y, 0, 70, "red", 1500);
     explosions.push(explosion);
     console.log("explosion at:", x,y);
 }
@@ -145,6 +145,40 @@ function animateExplosion() {
     });
 }
 
+document.addEventListener("click", function(event) {
+    const x = event.clientX;
+    const y = event.clientY;
+    createExplosion(x, y);
+  });
+
+
+
+
+//explosion code 
+
+function createExplosion(x, y) {
+    const explosion = new Explosion(x, y, 0, 70, "red", 1500);
+    explosions.push(explosion);
+    console.log("explosion at:", x,y);
+}
+
+function animateExplosion() {
+    explosions.forEach((explosion, index) => {
+        explosion.update(1000 / 60); 
+        if (explosion.elapsedTime >= explosion.duration) {
+            explosions.splice(index, 1); 
+        }
+    });
+}
+
+document.addEventListener("click", function(event) {
+    const x = event.clientX;
+    const y = event.clientY;
+    createExplosion(x, y);
+  });
+
+
+//animate
 
 
 function animate() {
@@ -154,15 +188,14 @@ function animate() {
     animateEnemy();
     animationId = requestAnimationFrame(animate);
     enemies.forEach(function(enemy, index) {
-        if (enemy.y > canvas.height || enemy.y < 0 || enemy.x > canvas.width || enemy.x < 0) {
+        if (enemy.y >= canvas.height || enemy.y < 0 || enemy.x > canvas.width || enemy.x < 0) {
             enemies.splice(index, 1);
     };
     });
     };
 
 
-
-
+    //init
 function initialize() {
     const container = document.getElementById("container");
     canvas.width = container.clientWidth;
@@ -170,20 +203,22 @@ function initialize() {
 }
 initialize();
 
-
+//start game
 function startGame() {
     const x = canvas.width / 2;
     const y = canvas.height - 50;
     animate();
-    createEnemy();
 }
 startGame();
 
+
+//reset game
 
 function resetGame() {
     explosions=[];
     enemies=[];
     missiles=[];
+    cancelAnimationFrame(animationId)
     c.clearRect(0, 0, canvas.width, canvas.height);
     initialize();
     startGame();
@@ -191,9 +226,3 @@ function resetGame() {
 resetButton.addEventListener("click", resetGame);
 
 
-document.addEventListener("click", function(event) {
-    const x = event.clientX;
-    const y = event.clientY;
-    createExplosion(x, y);
-    console.log("Mouse clicked at:", x, y);
-  });
