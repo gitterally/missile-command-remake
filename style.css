@@ -3,6 +3,8 @@ canvas {
     background-color: black;
     top: 0;
     left: 0;
+    min-width: 1080px;
+    max-width: 1080px
 }
 
 body { 
