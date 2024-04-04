@@ -205,8 +205,8 @@ function animateEnemy() {
 //missile code
 
 function createMissile(targetX, targetY) {
-    const missileStartX = canvas.width / 2; // Start missile from the center of the screen
-    const missileStartY = canvas.height; // Start missile from the bottom of the screen
+    const missileStartX = canvas.width / 2;
+    const missileStartY = canvas.height;
     const missileColour = "white";
     const missile = new Missile(targetX, targetY, missileStartX, missileStartY, missileColour);
     missiles.push(missile);
