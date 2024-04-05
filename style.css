@@ -45,18 +45,15 @@ body {
 button:active{
     transform: scale(0.9);
     color: grey;
-
   }
 
-  
   .score {
-    position: fixed;
-    top: 10px;
-    left: 10px;
+    display: flex;
+    position: relative;
     font-size: 22px;
-    color: white;
+    color: rgb(0, 0, 0);
   }
-  
+
   .score #score {
     font-weight: bold;
   }

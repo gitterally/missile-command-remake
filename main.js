@@ -11,20 +11,45 @@ var enemies = [];
 var missiles = [];
 var explosions = [];
 //var speed=1;fdfgdfgdfg
-var difficulty = 1;
+var difficulty = 10;
 var speed = 1;
 const baseExplosionDiameter = canvas.width;
+
 function difScale() {
   const baseSpeed = 0.5;
   const speedIncrement = 0.1;
   speed = baseSpeed + speedIncrement * difficulty;
 }
 
+// function killRatioCalc() {
+//     if (missileFired === 0) {
+//         return 0;
+//     } else {
+//         return (score / missileFired)*100;
+//     }
+// }
+
+function updateKillRatio(){
+if (missileFired === 0) {
+    ratio = 0;
+} else {
+    ratio =(score / missileFired)*100;
+}
+document.getElementById("killR").textContent = "Kill Ratio: " + ratio.toFixed(2) + " %" ;
+}
+
+
 
 function updateScore() {
     const scoreDisplay = document.getElementById("score");
     scoreDisplay.textContent = "SCORE: " + score.toString();
+    const missileLaunched = document.getElementById("missiles");
+    missileLaunched.textContent = "Missiles Launched: " + missileFired.toString();
+    updateKillRatio();
 }
+updateScore();
+
+
 
 //class constructors
 class Missile {
@@ -238,6 +263,7 @@ function createEnemy() {
 }
 createEnemy();
 
+
 function animateEnemy() {
   enemies.forEach((enemy) => {
     enemy.update();
@@ -265,6 +291,7 @@ function createMissile(x, y) {
   );
   missiles.push(missile);
   missileFired += 1; 
+  updateScore();
 }
 
 
@@ -347,12 +374,10 @@ function animate() {
   explosions.forEach((explosion) => {
     enemies.forEach((enemy, index) => {
       if (checkCollision(explosion, enemy)) {
-        // Enemy is within the explosion radius, remove it
+
         enemies.splice(index, 1);
-        // Optionally, increase score or trigger other effects
         score += 1;
         updateScore();
-        //console.log("score:", score, "collision with enemy at:", enemy.x, enemy.y);
       }
     });
   });
@@ -365,6 +390,7 @@ function initialize() {
   canvas.height = container.clientHeight - 60;
 }
 initialize();
+updateKillRatio();
 
 //start game
 function startGame() {
