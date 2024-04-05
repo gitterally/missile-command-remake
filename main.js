@@ -5,6 +5,7 @@ const resetButton = document.querySelector("#reset-button");
 let missileFired=0;
 let animationId;
 let player;
+let score=0;
 var level = 1;
 var enemies = [];
 var missiles = [];
@@ -12,11 +13,17 @@ var explosions = [];
 //var speed=1;fdfgdfgdfg
 var difficulty = 1;
 var speed = 1;
-
+const baseExplosionDiameter = canvas.width;
 function difScale() {
   const baseSpeed = 0.5;
   const speedIncrement = 0.1;
   speed = baseSpeed + speedIncrement * difficulty;
+}
+
+
+function updateScore() {
+    const scoreDisplay = document.getElementById("score");
+    scoreDisplay.textContent = "SCORE: " + score.toString();
 }
 
 //class constructors
@@ -30,7 +37,7 @@ class Missile {
     this.speed = canvas.width / 1000 / 2;
     this.dx = -targetX + startX;
     this.dy = -targetY + startY;
-    this.trail = new Trail('yellow');
+    this.trail = new Trail();
   }
 
   draw() {
@@ -62,13 +69,13 @@ class Missile {
     const dx = this.targetX - this.x;
     const dy = this.targetY - this.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
-    const velocityX = (dx / distance) * this.speed;
-    const velocityY = (dy / distance) * this.speed;
+    const unitX = (dx / distance);
+    const unitY = (dy / distance);
 
-    this.x += velocityX;
-    this.y += velocityY;
+    this.x += unitX*this.speed;
+    this.y += unitY*this.speed;
 
-    this.trail.emit(this.x+(dx / distance), this.y+(dy / distance), 3, 3, 3, 'yellow'); // Emit trail particles
+    this.trail.emit(this.x+unitX, this.y+unitY, 3, 3, 3, 'yellow'); // Emit trail particles
     this.trail.update(); // Update the trail particles
 
     this.draw();
@@ -176,7 +183,7 @@ class Explosion {
     this.x = x;
     this.y = y;
     this.radius = radius;
-    this.maxRadius = maxRadius;
+    this.maxRadius = baseExplosionDiameter;
     this.color = color;
     this.duration = duration;
     this.elapsedTime = 0;
@@ -233,7 +240,7 @@ createEnemy();
 
 function animateEnemy() {
   enemies.forEach((enemy) => {
-    enemy.update(1000 / 60);
+    enemy.update();
   });
 }
 
@@ -260,13 +267,12 @@ function createMissile(x, y) {
   missileFired += 1; 
 }
 
-console.log("numMissile");
 
 function animateMissile() {
   missiles.forEach((missile) => {
-    missile.update(1000 / 60);
+    missile.update();
   });
-}
+};
 
 function animateExplosion() {
   explosions.forEach((explosion, index) => {
@@ -275,15 +281,15 @@ function animateExplosion() {
       explosions.splice(index, 1);
     }
   });
-}
+};
 
 //explosion code
 
-function createExplosion(x, y) {
-  const explosion = new Explosion(x, y, 0, 70, "red", 1500);
+function createExplosion(x, y, baseExplosionDiameter) {
+  const explosion = new Explosion(x, y, 0, baseExplosionDiameter, "red", 1500);
   explosions.push(explosion);
-  console.log("explosion at:", x, y);
-}
+  //console.log("explosion at:", x, y);
+};
 
 function animateExplosion() {
   explosions.forEach((explosion, index) => {
@@ -292,7 +298,18 @@ function animateExplosion() {
       explosions.splice(index, 1);
     }
   });
-}
+};
+
+
+// Collision check
+
+  function checkCollision(explosion, enemy) {
+    const dx = explosion.x - enemy.x;
+    const dy = explosion.y - enemy.y;
+    const distanceSq = dx * dx + dy * dy;
+    const radiusSumSq = (explosion.radius + enemy.radius) ** 2;
+    return distanceSq < radiusSumSq;
+  };
 
 
 //animate
@@ -323,9 +340,23 @@ function animate() {
       missile.x < 0
     ) {
       missiles.splice(index, 1);
-    }
+    }    
   });
-}
+
+
+  explosions.forEach((explosion) => {
+    enemies.forEach((enemy, index) => {
+      if (checkCollision(explosion, enemy)) {
+        // Enemy is within the explosion radius, remove it
+        enemies.splice(index, 1);
+        // Optionally, increase score or trigger other effects
+        score += 1;
+        updateScore();
+        //console.log("score:", score, "collision with enemy at:", enemy.x, enemy.y);
+      }
+    });
+  });
+};
 
 //init
 function initialize() {
@@ -351,6 +382,7 @@ function resetGame() {
   missiles = [];
   missileFired=0;
   score=0;
+  updateScore();
   cancelAnimationFrame(animationId);
   c.clearRect(0, 0, canvas.width, canvas.height);
   initialize();

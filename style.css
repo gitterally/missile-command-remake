@@ -47,3 +47,16 @@ button:active{
     color: grey;
 
   }
+
+  
+  .score {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    font-size: 22px;
+    color: white;
+  }
+  
+  .score #score {
+    font-weight: bold;
+  }
