@@ -2,8 +2,8 @@
 const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
 const resetButton = document.querySelector("#reset-button");
-let canvasWidth = 0//canvas.width;
-let canvasHeight = 0//canvas.height;
+let canvasWidth = canvas.width;
+let canvasHeight = canvas.height;
 let missileFired = 0;
 let animationId;
 let player;
@@ -60,7 +60,7 @@ class Missile {
         this.targetX = targetX;
         this.targetY = targetY;
         this.colour = colour;
-        this.speed = canvas.width / 1000/2 ;
+        this.speed = canvas.width / 1000/3 ;
         this.dx = -targetX + startX;
         this.dy = -targetY + startY;
         this.trail = new Trail();
@@ -253,6 +253,7 @@ function createEnemy() {
         createEnemy();
     }, nextEnemyDelay);
 }
+createEnemy();
 
 
 function animateEnemy() {
@@ -382,7 +383,6 @@ function initialize() {
     canvasHeight = container.clientHeight - 60;
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
-    createEnemy();
 }
 initialize();
 updateKillRatio();
