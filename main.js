@@ -2,19 +2,21 @@
 const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
 const resetButton = document.querySelector("#reset-button");
-let canvasWidth = canvas.width;
-let canvasHeight = canvas.height;
+const startButton = document.querySelector("#start-button");
+const canvasWidth = 1280;
+const canvasHeight = 720;
+let gameStarted = false
 let missileFired = 0;
 let animationId;
 let player;
 let score = 0;
+let existEnemy=false;
 var level = 1;
 var enemies = [];
 var missiles = [];
 var explosions = [];
 var difficulty = 5;
 var speed = 1;
-const baseExplosionDiameter = canvasWidth;
 
 function difScale() {
     const baseSpeed = 0.5;
@@ -60,7 +62,7 @@ class Missile {
         this.targetX = targetX;
         this.targetY = targetY;
         this.colour = colour;
-        this.speed = canvas.width / 1000/3 ;
+        this.speed = canvasWidth / 1000/3 ;
         this.dx = -targetX + startX;
         this.dy = -targetY + startY;
         this.trail = new Trail();
@@ -86,8 +88,6 @@ class Missile {
     }
 
 
-
-
     update() {
         // Update missile position based on the target position
         const dx = this.targetX - this.x;
@@ -99,13 +99,13 @@ class Missile {
         this.x += unitX * this.speed;
         this.y += unitY * this.speed;
 
-        this.trail.emit(this.x + unitX, this.y + unitY, 3, 3, 3, 'yellow'); // Emit trail particles
+        this.trail.emitMissileTrail(this.x, this.y);
         this.trail.update(); // Update the trail particles
 
         this.draw();
 
         if (distance < this.speed) {
-            createExplosion(this.targetX, this.targetY, baseExplosionDiameter);
+            createExplosion(this.targetX, this.targetY, maxRadius);
             missiles.splice(missiles.indexOf(this), 1);
         }
 
@@ -139,8 +139,7 @@ class Enemy {
         // Update enemy position
         this.x += this.dirX;
         this.y += this.dirY;
-
-        this.trail.emit(this.x - 2.5, this.y - 2.5, 5, 5, 2);
+        this.trail.emitEnemyTrail(this.x, this.y);
         this.trail.update();
         this.draw();
     }
@@ -169,7 +168,32 @@ class Trail {
         this.particles = [];
     }
 
-    emit(x, y, width, height, numParticles, color) {
+    emitEnemyTrail(x, y) {
+        const width = canvasWidth/500;
+        const height = canvasWidth/500;
+        const numParticles = 3;
+        const color = 'rgba(255, 165, 0, 0.5)';
+
+        for (let i = 0; i < numParticles; i++) {
+            const transparency = 0.2;
+            const particle = new TrailParticle(
+                x,
+                y,
+                width,
+                height,
+                color,
+                transparency
+            );
+            this.particles.push(particle);
+        }
+    }
+
+    emitMissileTrail(x, y) {
+        const width = 3;
+        const height = 3;
+        const numParticles = 2;
+        const color = 'yellow';
+
         for (let i = 0; i < numParticles; i++) {
             const transparency = 0.2;
             const particle = new TrailParticle(
@@ -199,6 +223,7 @@ class Trail {
         });
     }
 }
+
 
 // Game Logic...
 
@@ -245,7 +270,8 @@ function enemyDir() {
 //enemy code
 function createEnemy() {
     const dir = enemyDir();
-    const enemy = new Enemy(dir[0], 1, 10, dir[1], dir[2], "orange"); //constructor(x,y,radius, dirX, dirY, color)
+    existEnemy=true;
+    const enemy = new Enemy(dir[0], 1, canvasWidth/500, dir[1], dir[2], "orange"); //constructor(x,y,radius, dirX, dirY, color)
     enemies.push(enemy);
     //console.log(`enemy at: ${dir[0]},travelling in direction ${dir[1]}, ${dir[2]}`);
     const nextEnemyDelay = Math.random() * 1000 + 0;
@@ -253,7 +279,7 @@ function createEnemy() {
         createEnemy();
     }, nextEnemyDelay);
 }
-createEnemy();
+
 
 
 function animateEnemy() {
@@ -288,7 +314,7 @@ function createMissile(x, y) {
 
 
 function animateMissile() {
-    missiles.forEach((missile) => {
+    missiles.forEach(function (missile) {
         missile.update();
     });
 };
@@ -311,14 +337,14 @@ function createExplosion(x, y, maxRadius) {
     //console.log("explosion at:", x, y);
 };
 
-function animateExplosion() {
-    explosions.forEach((explosion, index) => {
-        explosion.update(1000 / 60);
-        if (explosion.elapsedTime >= explosion.duration) {
-            explosions.splice(index, 1);
-        }
-    });
-};
+// function animateExplosion() {
+//     explosions.forEach((explosion, index) => {
+//         explosion.update(1000 / 60);
+//         if (explosion.elapsedTime >= explosion.duration) {
+//             explosions.splice(index, 1);
+//         }
+//     });
+// };
 
 
 // Collision check
@@ -362,12 +388,9 @@ function animate() {
             missiles.splice(index, 1);
         }
     });
-
-
     explosions.forEach((explosion) => {
         enemies.forEach((enemy, index) => {
             if (checkCollision(explosion, enemy)) {
-
                 enemies.splice(index, 1);
                 score += 1;
                 updateScore();
@@ -378,26 +401,38 @@ function animate() {
 
 //init
 function initialize() {
-    const container = document.getElementById("container");
-    canvasWidth = container.clientWidth;
-    canvasHeight = container.clientHeight - 60;
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
+    maxRadius = Math.min(canvasWidth, canvasHeight) / 5;
 }
-initialize();
-updateKillRatio();
+// initialize();
+// updateKillRatio();
 
 //start game
 function startGame() {
     // const x = canvas.width / 2;
     // const y = canvas.height - 50;
+    initialize();
+    cancelAnimationFrame(animationId);
+    enemies = [];
+    missiles = [];
+    explosions = [];
+    missileFired = 0;
+    score = 0;
+    updateScore();
     animate();
+    gameStarted=true;
+    if(!existEnemy){
+        createEnemy();
+    }
+    console.log(gameStarted)
 }
-startGame();
+
 
 //reset game
 
 function resetGame() {
+    gameStarted = false;
     explosions = [];
     enemies = [];
     missiles = [];
@@ -415,19 +450,22 @@ function resetGame() {
 
 document.addEventListener("click", function (event) {
     const rect = canvas.getBoundingClientRect();
-    const mouseX = event.clientX - rect.left;
-    const mouseY = event.clientY - rect.top;
+    const mouseX = event.clientX-rect.left;
+    const mouseY = event.clientY-rect.top;
 
     if (
-        mouseX >= 0 &&
-        mouseX <= canvas.width &&
-        mouseY >= 0 &&
-        mouseY <= canvas.height
+        event.clientX >= rect.left &&
+        event.clientX <= rect.right &&
+        event.clientY >= rect.top &&
+        event.clientY <= rect.bottom &&
+        gameStarted
     ) {
-        createMissile(event.clientX, event.clientY);
+        createMissile(mouseX, mouseY);
     }
+
 });
 
 
 resetButton.addEventListener("click", resetGame);
 window.addEventListener('resize', initialize);
+startButton.addEventListener("click", startGame);
