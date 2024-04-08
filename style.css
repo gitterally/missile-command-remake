@@ -1,59 +1,54 @@
 canvas {
-    position: absolute;
-    background-color: black;
-    top: 0;
-    left: 0;
-    min-width: 1080px;
+  position: absolute;
+  background-color: black;
+  top: 0;
+  left: 0;
+  min-width: 1080px;
 }
 
-body { 
-    height: 95vh;
-    width: 100vw;
-    margin: 0;
-    padding: 0;
+body {
+  height: 95vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
 }
 
 .container {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
 }
 
 .bottom-menu {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    height: 5%;
-    background-color: #f2f2f2;
-  }
-  
-  .menu-button {
-    padding: 10px 20px;
-    background-color: #333;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: transform 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 5%;
+  background-color: #f2f2f2;
 }
 
-button:active{
-    transform: scale(0.9);
-    color: grey;
-  }
+.menu-button {
+  padding: 10px 20px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
 
-  .score {
-    display: flex;
-    position: relative;
-    font-size: 22px;
-    color: rgb(0, 0, 0);
-  }
+.menu-button:active {
+  transform: scale(0.9);
+}
 
-  .score #score {
-    font-weight: bold;
-  }
+.score {
+  margin: 0 10px; /* Added margin for spacing */
+  font-size: 16px;
+  color: #000;
+}
+
