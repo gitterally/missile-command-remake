@@ -3,6 +3,7 @@ const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
 const resetButton = document.querySelector("#reset-button");
 const pauseButton = document.querySelector("#pause-button");
+const rect = canvas.getBoundingClientRect();
 const canvasWidth = 1280;
 const canvasHeight = 720;
 let gameStarted = false;
@@ -35,10 +36,49 @@ function difScale() {
 // }
 
 //graphics
+function drawSilo(x, y, width, height) {
+    const domeRadius = width / 10; // Radius of the dome (half of the width)
+
+    c.save();
+
+    // Draw the main body of the silo
+    c.fillStyle = "gray";
+    c.fillRect(x, y, width, height);
+
+    // Calculate the position and size of the dome
+    const domeCenterX = x + width / 2;
+    const domeCenterY = y; // Positioned at the top center of the silo
+    const domeStartAngle = 0;
+    const domeEndAngle = Math.PI; // Draw a semi-circle (180 degrees)
+
+    // Draw the dome (semi-circle) at the top center
+    c.beginPath();
+    c.arc(domeCenterX, domeCenterY, domeRadius, domeStartAngle, domeEndAngle, true); 
+    c.closePath();
+    c.fill();
+
+    c.restore();
+}
+function drawSilos() {
+    const siloWidth = 100;
+    const siloHeight = 10;
+    const pageWidth = canvas.width;
+
+ 
+    const silo1X = pageWidth / 6 - siloWidth / 2;
+    const silo1Y = canvasHeight - siloHeight;
+    drawSilo(silo1X, silo1Y, siloWidth, siloHeight);
 
 
+    const silo2X = pageWidth / 2 - siloWidth / 2;
+    const silo2Y = canvasHeight - siloHeight;
+    drawSilo(silo2X, silo2Y, siloWidth, siloHeight);
 
-function baseINdicator
+
+    const silo3X = pageWidth*5/6 - siloWidth / 2;
+    const silo3Y = canvasHeight - siloHeight;
+    drawSilo(silo3X, silo3Y, siloWidth, siloHeight);
+}
 
 
 
@@ -412,6 +452,7 @@ function initialize() {
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
     maxRadius = Math.min(canvasWidth, canvasHeight) / 5;
+    drawSilos();
 }
 initialize();
 // updateKillRatio();
