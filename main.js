@@ -19,7 +19,8 @@ var missiles = [];
 var explosions = [];
 var difficulty = 5;
 var speed = 1;
-
+const siloWidth = 150;
+const siloHeight = 10;
 
 function difScale() {
     const baseSpeed = 0.5;
@@ -36,13 +37,13 @@ function difScale() {
 // }
 
 //graphics
-function drawSilo(x, y, width, height) {
+function drawSilo(x, y, width, height, color) {
     const domeRadius = width / 10; // Radius of the dome (half of the width)
 
     c.save();
 
     // Draw the main body of the silo
-    c.fillStyle = "gray";
+    c.fillStyle = color;
     c.fillRect(x, y, width, height);
 
     // Calculate the position and size of the dome
@@ -59,27 +60,22 @@ function drawSilo(x, y, width, height) {
 
     c.restore();
 }
-function drawSilos() {
-    const siloWidth = 100;
-    const siloHeight = 10;
-    const pageWidth = canvas.width;
-
- 
-    const silo1X = pageWidth / 6 - siloWidth / 2;
+function drawSilos(color1, color2, color3) {;
+    
+    const silo1X = canvasWidth / 6 - siloWidth / 2;
     const silo1Y = canvasHeight - siloHeight;
-    drawSilo(silo1X, silo1Y, siloWidth, siloHeight);
+    drawSilo(silo1X, silo1Y, siloWidth, siloHeight, color1);
 
 
-    const silo2X = pageWidth / 2 - siloWidth / 2;
+    const silo2X = canvasWidth / 2 - siloWidth / 2;
     const silo2Y = canvasHeight - siloHeight;
-    drawSilo(silo2X, silo2Y, siloWidth, siloHeight);
+    drawSilo(silo2X, silo2Y, siloWidth, siloHeight, color2);
 
 
-    const silo3X = pageWidth*5/6 - siloWidth / 2;
+    const silo3X = canvasWidth*5/6 - siloWidth / 2;
     const silo3Y = canvasHeight - siloHeight;
-    drawSilo(silo3X, silo3Y, siloWidth, siloHeight);
+    drawSilo(silo3X, silo3Y, siloWidth, siloHeight, color3);
 }
-
 
 
 function updateKillRatio() {
@@ -351,7 +347,7 @@ function createMissile(x, y) {
     } else if (x > canvasWidth / 3 * 2) {
         missileStartX = canvasWidth / 6 * 5;
     };
-    const missileStartY = canvasHeight - 5;
+    const missileStartY = canvasHeight - 10;
     const missileColour = "white";
     const missile = new Missile(
         x,
@@ -403,7 +399,7 @@ function checkCollision(explosion, enemy) {
 
 //animate
 function animate() {
-  
+    
   if (!gamePaused){
     difScale();
     c.clearRect(0, 0, canvas.width, canvas.height);
@@ -411,6 +407,16 @@ function animate() {
     animateExplosion();
     animateEnemy();
     animateMissile();
+
+    console.log(x);
+    if (x <= canvasWidth / 3) {
+    drawSilos('red', 'grey', 'grey');
+  } else if (x > canvasWidth / 3 && x <= canvasWidth / 3 * 2) {
+    drawSilos('grey', 'red', 'grey');
+  } else if (x > canvasWidth / 3 * 2) {
+    drawSilos('grey', 'grey', 'red');
+  };
+
     animationId = requestAnimationFrame(animate);
 
     enemies.forEach(function (enemy, index) {
@@ -452,7 +458,7 @@ function initialize() {
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
     maxRadius = Math.min(canvasWidth, canvasHeight) / 5;
-    drawSilos();
+
 }
 initialize();
 // updateKillRatio();
@@ -533,3 +539,16 @@ function pauseGame() {
 resetButton.addEventListener("click", resetGame);
 pauseButton.addEventListener("click", pauseGame);
 window.addEventListener('resize', initialize);
+
+document.getElementById('canvas').addEventListener('mousemove', onMouseUpdate, false);
+document.getElementById('canvas').addEventListener('mouseenter', onMouseUpdate, false);
+
+    
+function onMouseUpdate(event) {
+  const rect = canvas.getBoundingClientRect();
+  x = event.clientX-rect.left;
+}
+
+function getMouseX() {
+  return x
+}
