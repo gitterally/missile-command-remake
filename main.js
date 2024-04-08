@@ -2,10 +2,11 @@
 const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
 const resetButton = document.querySelector("#reset-button");
-const startButton = document.querySelector("#start-button");
+const pauseButton = document.querySelector("#pause-button");
 const canvasWidth = 1280;
 const canvasHeight = 720;
-let gameStarted = false
+let gameStarted = false;
+let gamePaused = false;
 let missileFired = 0;
 let animationId;
 let player;
@@ -17,6 +18,7 @@ var missiles = [];
 var explosions = [];
 var difficulty = 5;
 var speed = 1;
+
 
 function difScale() {
     const baseSpeed = 0.5;
@@ -31,6 +33,14 @@ function difScale() {
 //         return (score / missileFired)*100;
 //     }
 // }
+
+//graphics
+
+
+
+function baseINdicator
+
+
 
 function updateKillRatio() {
     if (missileFired === 0) {
@@ -62,7 +72,7 @@ class Missile {
         this.targetX = targetX;
         this.targetY = targetY;
         this.colour = colour;
-        this.speed = canvasWidth / 1000/3 ;
+        this.speed = canvasWidth / 1000/2 ;
         this.dx = -targetX + startX;
         this.dy = -targetY + startY;
         this.trail = new Trail();
@@ -225,6 +235,9 @@ class Trail {
 }
 
 
+
+
+
 // Game Logic...
 
 class Explosion {
@@ -247,7 +260,7 @@ class Explosion {
 
     update(runTime) {
         this.elapsedTime += runTime;
-        this.radius = this.elapsedTime / this.duration * this.maxRadius;
+        this.radius = this.elapsedTime / this.duration * this.maxRadius; //to control explosion speed
         this.draw();
     }
 }
@@ -332,20 +345,10 @@ function animateExplosion() {
 
 // constructor(x, y, radius, maxRadius, color, duration)
 function createExplosion(x, y, maxRadius) {
-    const explosion = new Explosion(x, y, 0, maxRadius, "red", 1500);
+    const explosion = new Explosion(x, y, 0, maxRadius, "red", 1000);
     explosions.push(explosion);
     //console.log("explosion at:", x, y);
 };
-
-// function animateExplosion() {
-//     explosions.forEach((explosion, index) => {
-//         explosion.update(1000 / 60);
-//         if (explosion.elapsedTime >= explosion.duration) {
-//             explosions.splice(index, 1);
-//         }
-//     });
-// };
-
 
 // Collision check
 
@@ -360,6 +363,8 @@ function checkCollision(explosion, enemy) {
 
 //animate
 function animate() {
+  
+  if (!gamePaused){
     difScale();
     c.clearRect(0, 0, canvas.width, canvas.height);
     missiles.forEach((missile) => missile.update());
@@ -397,6 +402,9 @@ function animate() {
             }
         });
     });
+} else {
+    cancelAnimationFrame(animationId); 
+}
 };
 
 //init
@@ -405,7 +413,7 @@ function initialize() {
     canvas.height = canvasHeight;
     maxRadius = Math.min(canvasWidth, canvasHeight) / 5;
 }
-// initialize();
+initialize();
 // updateKillRatio();
 
 //start game
@@ -425,14 +433,14 @@ function startGame() {
     if(!existEnemy){
         createEnemy();
     }
-    console.log(gameStarted)
+    document.getElementById("reset-button").textContent = "RESTART GAME";
+    pauseButton.textContent = "PAUSE GAME";
 }
 
 
 //reset game
 
 function resetGame() {
-    gameStarted = false;
     explosions = [];
     enemies = [];
     missiles = [];
@@ -443,6 +451,7 @@ function resetGame() {
     c.clearRect(0, 0, canvas.width, canvas.height);
     initialize();
     startGame();
+    
 }
 
 
@@ -458,7 +467,8 @@ document.addEventListener("click", function (event) {
         event.clientX <= rect.right &&
         event.clientY >= rect.top &&
         event.clientY <= rect.bottom &&
-        gameStarted
+        gameStarted &&
+        !gamePaused
     ) {
         createMissile(mouseX, mouseY);
     }
@@ -466,6 +476,19 @@ document.addEventListener("click", function (event) {
 });
 
 
+function pauseGame() {
+    gamePaused = !gamePaused; // Toggle the gamePaused variable
+
+    if (gamePaused) {
+        cancelAnimationFrame(animationId); // Stop the animation loop
+        pauseButton.textContent = "RESUME GAME";
+    } else {
+        animate(); // Resume the animation loop
+        pauseButton.textContent = "PAUSE GAME";
+    }
+}
+
+
 resetButton.addEventListener("click", resetGame);
+pauseButton.addEventListener("click", pauseGame);
 window.addEventListener('resize', initialize);
-startButton.addEventListener("click", startGame);
