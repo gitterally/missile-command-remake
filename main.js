@@ -156,7 +156,7 @@ class Missile {
     this.targetX = targetX;
     this.targetY = targetY;
     this.colour = colour;
-    this.speed = canvasWidth / 1000 / 2;
+    this.speed = canvasWidth / 1000;
     this.dx = -targetX + startX;
     this.dy = -targetY + startY;
     this.trail = new Trail();
@@ -519,12 +519,12 @@ function animate() {
 
 //init
 function initialize() {
-  canvas.width = canvasWidth;
-  canvas.height = canvasHeight;
-  maxRadius = Math.min(canvasWidth, canvasHeight) / 5;
-}
-initialize();
-// updateKillRatio();
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+    maxRadius = Math.min(canvasWidth, canvasHeight) / 5;
+  }
+  initialize();
+  // updateKillRatio();
 
 //start game
 function startGame() {
@@ -551,18 +551,24 @@ function startGame() {
 //reset game
 
 function resetGame() {
-    enemies = [];
-  missiles = [];
-  explosions = [];
-  [silo1HitCount, silo2HitCount, silo3HitCount] = [0, 0, 0];
-  missileFired = 0;
-  score = 0;
   updateScore();
   cancelAnimationFrame(animationId);
   c.clearRect(0, 0, canvas.width, canvas.height);
   initialize();
   startGame();
 }
+
+function pauseGame() {
+    gamePaused = !gamePaused; // Toggle the gamePaused variable
+  
+    if (gamePaused) {
+      cancelAnimationFrame(animationId); // Stop the animation loop
+      pauseButton.textContent = "RESUME GAME";
+    } else {
+      animate(); // Resume the animation loop
+      pauseButton.textContent = "PAUSE GAME";
+    }
+  }
 
 //Event Listeners
 
@@ -583,17 +589,7 @@ document.addEventListener("click", function (event) {
   }
 });
 
-function pauseGame() {
-  gamePaused = !gamePaused; // Toggle the gamePaused variable
 
-  if (gamePaused) {
-    cancelAnimationFrame(animationId); // Stop the animation loop
-    pauseButton.textContent = "RESUME GAME";
-  } else {
-    animate(); // Resume the animation loop
-    pauseButton.textContent = "PAUSE GAME";
-  }
-}
 
 resetButton.addEventListener("click", resetGame);
 pauseButton.addEventListener("click", pauseGame);
