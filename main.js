@@ -551,6 +551,12 @@ function startGame() {
 //reset game
 
 function resetGame() {
+    enemies = [];
+  missiles = [];
+  explosions = [];
+  [silo1HitCount, silo2HitCount, silo3HitCount] = [0, 0, 0];
+  missileFired = 0;
+  score = 0;
   updateScore();
   cancelAnimationFrame(animationId);
   c.clearRect(0, 0, canvas.width, canvas.height);
