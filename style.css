@@ -4,9 +4,9 @@
   top: 0;
   left: 0;
   cursor: crosshair;
-  max-width: 1280px; /* Set maximum width to maintain aspect ratio */
-  max-height: 720px; /* Set maximum height to maintain aspect ratio */
-  image-rendering: pixelated; /* Maintain pixelated appearance */
+  max-width: 1280px; 
+  max-height: 720px; 
+  image-rendering:optimizeQuality ; 
 }
 
 body {

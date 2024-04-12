@@ -43,3 +43,7 @@ Contributions are welcome! If you'd like to contribute to this project, please f
 ## License
 
 
+
+
+https://creatorassets.com/a/8bit-explosion-sound-effects
+https://pixabay.com/sound-effects/search/8%20bit/

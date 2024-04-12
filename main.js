@@ -18,7 +18,7 @@ var enemies = [];
 var missiles = [];
 var explosions = [];
 var difficulty=1;
-var speed = 1;
+var speed = 0.5;
 const siloWidth = 150;
 const siloHeight = 10;
 const [silo1Y, silo2Y, silo3Y] = [
@@ -35,19 +35,46 @@ let [silo1Hit, silo2Hit, silo3Hit] = [false, false, false];
 let [silo1HitCount, silo2HitCount, silo3HitCount] = [0, 0, 0];
 
 function diffScale() {
-  const baseSpeed = 0.5;
+  const baseSpeed = 0;
   const speedIncrement = 0.1;
   speed = baseSpeed + speedIncrement * difficulty;
-  console.log(difficulty);
 }
 
-// function killRatioCalc() {
-//     if (missileFired === 0) {
-//         return 0;
-//     } else {
-//         return (score / missileFired)*100;
-//     }
-// }
+// Function to flash the screen
+function flashScreen(times, color, toggle, duration) {
+  let count = 0;
+  let interval = setInterval(function() {
+      if (count % 2 === 0) {
+          if (toggle === 'background') {
+              document.body.style.backgroundColor = color;
+          } else if (toggle === 'canvas') {
+              c.fillStyle = color;
+              c.fillRect(10, 10, canvas.width-20, canvas.height-20);
+              c.transparency=0.5
+          }
+      } else {
+          if (toggle === 'background') {
+              document.body.style.backgroundColor = 'black';
+          } else if (toggle === 'canvas') {
+              c.fillStyle = 'black';
+              c.fillRect(10, 10, canvas.width-20, canvas.height-20);
+              c.transparency=0.5
+          }
+      }
+      
+      count++;
+      
+      if (count === times * 2) {
+          clearInterval(interval);
+          document.body.style.backgroundColor = '';
+          if (toggle === 'canvas') {
+              c.clearRect(0, 0, canvas.width, canvas.height);
+          }
+      }
+  }, duration);
+}
+
+
 
 //Silos
 function drawSilo(x, y, width, height, color) {
@@ -93,38 +120,38 @@ function checkEnemySiloCollision(enemy) {
   let silo2Hit = false;
   let silo3Hit = false;
 
-  const enemyBottomY = enemy.y + enemy.radius; // Bottom edge of the enemy (assuming circular enemy)
+  const enemyBottomY = enemy.y + enemy.radius; 
   const enemyLeftX = enemy.x - enemy.radius;
   const enemyRightX = enemy.x + enemy.radius;
-  // Check collision with each silo
+
   if (
-    enemyBottomY >= silo1Y && // Check collision with silo 1
+    enemyBottomY >= silo1Y && 
     enemyLeftX <= silo1X + siloWidth &&
     enemyRightX >= silo1X
   ) {
     console.log("silo1Hit");
     silo1HitCount++;
-    silo1Hit = true; // Collision detected with silo 1
+    silo1Hit = true; 
   }
 
   if (
-    enemyBottomY >= silo2Y && // Check collision with silo 1
+    enemyBottomY >= silo2Y && 
     enemyLeftX <= silo2X + siloWidth &&
     enemyRightX >= silo2X
   ) {
     console.log("silo2Hit");
     silo2HitCount++;
-    silo2Hit = true; // Collision detected with silo 2
+    silo2Hit = true; 
   }
 
   if (
-    enemyBottomY >= silo3Y && // Check collision with silo 1
+    enemyBottomY >= silo3Y && 
     enemyLeftX <= silo3X + siloWidth &&
     enemyRightX >= silo3X
   ) {
     console.log("silo3Hit");
     silo3HitCount++;
-    silo3Hit = true; // Collision detected with silo 3
+    silo3Hit = true; 
   }
 
   return silo1Hit || silo2Hit || silo3Hit;
@@ -145,16 +172,19 @@ function updateScore() {
   scoreDisplay.textContent = "SCORE: " + score.toString();
   const missileLaunched = document.getElementById("missiles");
   missileLaunched.textContent = "Missiles Launched: " + missileFired.toString();
+  const level = document.getElementById("difficulty");
+  level.textContent = "LEVEL: " + difficulty.toString();
   updateKillRatio();
   console.log("score: ", score)
 
   if (score % 100 === 0 && score !==0) {
     difficulty += 1;
+    playLevelledUpSound(1);
     diffScale(); 
   }
 
 }
-// updateScore();
+
 
 //class constructors
 class Missile {
@@ -164,7 +194,7 @@ class Missile {
     this.targetX = targetX;
     this.targetY = targetY;
     this.colour = colour;
-    this.speed = canvasWidth / 1000;
+    this.speed = speed;
     this.dx = -targetX + startX;
     this.dy = -targetY + startY;
     this.trail = new Trail();
@@ -206,7 +236,7 @@ class Missile {
     this.draw();
 
     if (distance < this.speed) {
-      createExplosion(this.targetX, this.targetY, maxRadius);
+      createExplosion(this.targetX, this.targetY, 'orange', maxRadius);
       missiles.splice(missiles.indexOf(this), 1);
     }
   }
@@ -406,6 +436,9 @@ function animateEnemy() {
   enemies.forEach(function (enemy, index) {
     if (enemy.y < canvasHeight - 10) {
       if (checkEnemySiloCollision(enemy, index)) {
+        flashScreen(2, 'red', 'canvas', 100);
+        createExplosion(enemy.x, enemy.y,'pink', 50);
+        playSiloHitSound(1);
         enemies.splice(index, 1);
       }
     }
@@ -435,6 +468,7 @@ function createMissile(x, y) {
   missiles.push(missile);
   missileFired += 1;
   updateScore();
+  playMissileLaunchedSound(1);
 }
 
 function animateMissile() {
@@ -455,9 +489,10 @@ function animateExplosion() {
 //explosion code
 
 // constructor(x, y, radius, maxRadius, color, duration)
-function createExplosion(x, y, maxRadius) {
-  const explosion = new Explosion(x, y, 0, maxRadius, "red", 1000);
+function createExplosion(x, y,color,maxRadius) {
+  const explosion = new Explosion(x, y, 0, maxRadius, color, 1000);
   explosions.push(explosion);
+  playExplosionSound(1);
   //console.log("explosion at:", x, y);
 }
 
@@ -518,6 +553,7 @@ function animate() {
           enemies.splice(index, 1);
           score += 1;
           updateScore();
+          playEnemyDestroyedSound(1);
         }
       });
     });
@@ -540,6 +576,11 @@ function startGame() {
   // const x = canvas.width / 2;
   // const y = canvas.height - 50;
   initialize();
+  playEnemyDestroyedSound(0);
+  playExplosionSound(0);
+  playSiloHitSound(0);
+  playMissileLaunchedSound(0);
+  playLevelledUpSound(0);
   cancelAnimationFrame(animationId);
   enemies = [];
   missiles = [];
@@ -586,6 +627,42 @@ function pauseGame() {
       pauseButton.textContent = "PAUSE GAME";
     }
   }
+
+
+//sound
+
+const enemyDestroyedSound = new Audio('http://127.0.0.1:8080/one_beep-99630.mp3');
+const explosionSound = new Audio('http://127.0.0.1:8080/positive-feedback-38518.mp3');
+const siloHitSound = new Audio('http://127.0.0.1:8080/8-bit-explosion-95847.mp3');
+const missileLaunchedSound = new Audio('http://127.0.0.1:8080/woosh-sfx-95844.mp3');
+const levelledUpSound = new Audio('http://127.0.0.1:8080/winsquare-6993.mp3');
+
+function playEnemyDestroyedSound(v) {
+  enemyDestroyedSound.currentTime = 0; 
+  enemyDestroyedSound.volume = v;
+  enemyDestroyedSound.play();
+}
+function playExplosionSound(v) {
+  explosionSound.currentTime = 0; 
+  explosionSound.play();
+  explosionSound.volume = v;
+}
+function playSiloHitSound(v) {
+  siloHitSound.currentTime = 0;
+  siloHitSound.play();
+  siloHitSound.volume = v;
+}
+function playMissileLaunchedSound(v) {
+  missileLaunchedSound.currentTime = 0;
+  missileLaunchedSound.play();
+  missileLaunchedSound.volume = v;
+}
+function playLevelledUpSound(v) {
+  levelledUpSound.currentTime = 0; 
+  levelledUpSound.volume = v;
+  levelledUpSound.play();
+}
+
 
 //Event Listeners
 
