@@ -17,7 +17,7 @@ var level = 1;
 var enemies = [];
 var missiles = [];
 var explosions = [];
-var difficulty = 5;
+var difficulty=1;
 var speed = 1;
 const siloWidth = 150;
 const siloHeight = 10;
@@ -34,10 +34,11 @@ const [silo1X, silo2X, silo3X] = [
 let [silo1Hit, silo2Hit, silo3Hit] = [false, false, false];
 let [silo1HitCount, silo2HitCount, silo3HitCount] = [0, 0, 0];
 
-function difScale() {
+function diffScale() {
   const baseSpeed = 0.5;
   const speedIncrement = 0.1;
   speed = baseSpeed + speedIncrement * difficulty;
+  console.log(difficulty);
 }
 
 // function killRatioCalc() {
@@ -145,8 +146,15 @@ function updateScore() {
   const missileLaunched = document.getElementById("missiles");
   missileLaunched.textContent = "Missiles Launched: " + missileFired.toString();
   updateKillRatio();
+  console.log("score: ", score)
+
+  if (score % 100 === 0 && score !==0) {
+    difficulty += 1;
+    diffScale(); 
+  }
+
 }
-updateScore();
+// updateScore();
 
 //class constructors
 class Missile {
@@ -466,12 +474,13 @@ function checkCollision(explosion, enemy) {
 //animate
 function animate() {
   if (!gamePaused) {
-    difScale();
+   
     c.clearRect(0, 0, canvas.width, canvas.height);
     missiles.forEach((missile) => missile.update());
     animateExplosion();
     animateEnemy();
     animateMissile();
+  
 
     if (x <= canvasWidth / 3) {
       drawSilos("red", "grey", "grey");
@@ -535,6 +544,7 @@ function startGame() {
   enemies = [];
   missiles = [];
   explosions = [];
+  difficulty = 1;
   [silo1HitCount, silo2HitCount, silo3HitCount] = [0, 0, 0];
   missileFired = 0;
   score = 0;
@@ -557,6 +567,7 @@ function resetGame() {
   [silo1HitCount, silo2HitCount, silo3HitCount] = [0, 0, 0];
   missileFired = 0;
   score = 0;
+  difficulty = 1;
   updateScore();
   cancelAnimationFrame(animationId);
   c.clearRect(0, 0, canvas.width, canvas.height);
