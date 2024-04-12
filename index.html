@@ -4,24 +4,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css">
     <title>Missile Defence</title>
 </head>
 
 <body>
-    <div>Missile Defence</div>
-    <div class="container" id="container">
-        <canvas class="canvas" id="canvas"></canvas>
-    </div>
-    <div class="bottom-menu">
-        <button class="menu-button" id="reset-button">START GAME</button>
-        <div class="score" id="score"> <span id="score"></span></div>
-        <div class="score" id="missiles"><span id="missiles"></span></div>
-        <div class="score" id="killRatio"><span id="killR"></span></div>
-        <div class="score" id="LEVEL"><span id="difficulty"></span></div>
-        <button class="menu-button" id="pause-button">PAUSE GAME</button>
+    <h1>Missile Defence</h1>
 
-        <script src="main.js" charset="utf-8"></script>
+    <div class="container">
+        <canvas id="canvas" class="canvas"></canvas>
+        <div id="game-over-screen" style="display: none;">
+            <div id="game-over-message">Game Over!</div>
+            <div>Final Score: <span id="final-score"></span></div>
+            <div>Kill Ratio: <span id="final-kill-ratio"></span></div>
+            <div>Missiles Fired: <span id="final-missiles-fired"></span></div>
+            <div>Level: <span id="final-game-level"></span></div>
+            <button id="restart-button">Restart</button>
+        </div>
+    </div>
+
+    <div class="bottom-menu">
+        <button id="reset-button" class="menu-button">START GAME</button>
+        <div class="score">Score: <span id="score"></span></div>
+        <div class="score">Missiles Fired: <span id="missiles"></span></div>
+        <div class="score">Kill Ratio: <span id="killR"></span></div>
+        <div class="score">Level: <span id="difficulty"></span></div>
+        <button id="pause-button" class="menu-button">PAUSE GAME</button>
+    </div>
+
+   
+
+    <script src="main.js" charset="utf-8"></script>
 </body>
 
 </html>
